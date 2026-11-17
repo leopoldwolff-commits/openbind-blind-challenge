@@ -1,0 +1,4 @@
+# Writes predictions as PDB files, which is what the challenge submission needs.
+# The default is mmCIF. Pass this with --runner-yaml.
+output_writer_settings:
+  structure_format: pdb

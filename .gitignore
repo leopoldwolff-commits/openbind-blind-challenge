@@ -1,0 +1,18 @@
+# Model outputs and large artefacts
+predictions/
+submission/*.zip
+*.pt
+
+# Challenge input data (redistributing it is not mine to do; see README)
+data/queries/
+data/*.csv
+data/*.fasta
+
+# Scratch
+data/_demo/
+.DS_Store
+.ipynb_checkpoints/
+__pycache__/
+
+# Unrelated files that live in this folder
+*.png
