@@ -25,17 +25,25 @@ def main():
     print(f"{len(ids)} compounds expected, using id column {id_col!r}")
 
     preds = pathlib.Path(a.preds)
-    found, missing, empty = {}, [], []
+    found, missing, empty, multi = {}, [], [], []
     for cid in ids:
-        hits = sorted(preds.rglob(f"{cid}.pdb"))
+        # OpenFold3 names outputs <id>_seed_<n>_sample_<n>_model.pdb, so match
+        # on the prefix rather than an exact filename.
+        hits = sorted(preds.rglob(f"{cid}.pdb")) or sorted(preds.rglob(f"{cid}_*.pdb"))
         if not hits:
             missing.append(cid)
-        else:
-            if hits[0].stat().st_size < 500:
-                empty.append(cid)
-            found[cid] = hits[0]
+            continue
+        if len(hits) > 1:
+            multi.append(cid)
+        pick = hits[0]
+        if pick.stat().st_size < 500:
+            empty.append(cid)
+        found[cid] = pick
 
     print(f"found {len(found)}, missing {len(missing)}, suspiciously small {len(empty)}")
+    if multi:
+        print(f"{len(multi)} compounds have several samples; taking the first by name."
+              " Rank them properly before the real submission.")
     if missing:
         print("missing:", ", ".join(missing[:15]), "..." if len(missing) > 15 else "")
     if empty:
