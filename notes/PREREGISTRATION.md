@@ -104,12 +104,34 @@ Replicate disagreement also says how much of any single prediction is seed luck 
 than compound difficulty. No effect smaller than this noise floor will be claimed from
 the single-pose run, and the floor will be reported whether or not it is convenient.
 
-### Scope
+### Scope, decided 20 November before the replicates were run
 
-If compute does not stretch to replicates for all 400, they will be run on a subset
-spread across the range of molecular size and confidence, chosen and recorded here
-before the replicates are run. The single-pose run of all 400 remains the submission
-and remains the basis for H1 to H3.
+A timing test on three compounds settled the cost. The expensive step is the trunk,
+the model building its internal picture of the protein and the compound. Drawing
+several poses out of that picture afterwards is nearly free: one seed producing one
+pose took 27 seconds, one seed producing five took 24.5. Cost therefore scales with
+compounds times seeds, not with poses.
+
+Replicates will be run on **all 400 compounds at five seeds, five poses per seed**,
+giving 25 poses each, at a cost of roughly 14 hours. The five seeds are
+2746317213, 1181241943, 958682846, 3163119785 and 1812140441, and the same five are
+used for every compound, so a compound that scatters more is scattering because of the
+compound and not because of which random numbers it drew. No subset is needed.
+
+### The submitted poses change, and why
+
+The original run drew one pose per compound. The replicate run draws 25, and the model
+ranks them itself. The submission will therefore be the highest ranked of the 25 rather
+than the single pose originally drawn.
+
+This uses only the model's own ranking. No information about the answers enters the
+choice, and the ranking was available before any answer was released.
+
+The consequence is that H1 to H3 will be tested against the submitted poses, which are
+now the ensemble-selected ones, not the original single draws. This is recorded here
+before the replicate run begins. The original single-pose predictions are kept and
+remain in the repository, so if the true structures are released rather than only a
+score, both sets can be scored and the difference between them reported.
 
 ## Problems known in advance
 
