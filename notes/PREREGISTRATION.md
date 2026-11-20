@@ -79,3 +79,58 @@ Within-set similarity is a proxy. The hypothesis concerns similarity to OpenBind
 training data, which would require comparison against protein-ligand complexes
 deposited before 30 June 2025. That measure has not been computed here, and any
 finding about novelty rests on the proxy until it is.
+
+---
+
+## Amendment, 19 November 2026
+
+Added before any replicate has been run and before any answer is known.
+
+### Motivation
+
+The hypotheses above treat the model's self-reported confidence as the only
+uncertainty signal available from the model itself. That signal is a self-report,
+and the retrospective work in `openbind0-generalisation` found it under-warns on
+unfamiliar cases. A second signal is available from the model's behaviour rather
+than its self-report: how much its predicted pose moves when the same compound is
+run again from a different seed.
+
+A compound whose replicate poses all land in the same place is one the model is
+internally consistent about. One whose replicates scatter across the pocket is not,
+whatever confidence it reports.
+
+### Measurement
+
+Each compound in the replicate set is predicted several times with different model
+seeds. For each pair of replicates the structures are superposed on the protein
+backbone, to put them in a common frame, and the root mean square deviation between
+the ligand positions is computed. The median pairwise ligand RMSD is that compound's
+**ensemble spread**.
+
+### Additional hypotheses
+
+**H4. Ensemble spread predicts success.** Compounds whose replicate poses agree are
+more likely to be correct than compounds whose replicates scatter.
+
+**H5. Ensemble spread predicts success better than the model's self-reported
+confidence does.** Compared by area under the ROC curve, with bootstrap intervals
+resampling whole scaffold families.
+
+**H6. Ensemble spread does not under-warn in the way self-reported confidence does.**
+In a logistic regression of success on ensemble spread and structural similarity, the
+similarity term is weaker than the equivalent term alongside self-reported confidence
+in H3. If this fails, both signals share the same blind spot, which is also a result.
+
+### The noise floor
+
+Replicate disagreement also measures how much of any single prediction's outcome is
+seed luck rather than compound difficulty. No effect smaller than this noise floor
+will be claimed from the single-sample run, and the floor will be reported whether or
+not it is convenient.
+
+### Scope
+
+If compute does not allow replicates for all 400 compounds, they will be run on a
+subset stratified across molecular size and self-reported confidence, chosen before
+the replicates are run and recorded here. The single-sample run of all 400 described
+above remains the submission and remains the basis for H1 to H3.
