@@ -74,6 +74,45 @@ check("within-seed picks out the close pairs", abs(out["within_seed"] - 1.3) < 1
 check("between-seed picks out the far ones", abs(out["between_seed"] - 13.0) < 1e-9,
       f"got {out['between_seed']:.4f}")
 
+print("\nsymmetry correction")
+try:
+    from rdkit import Chem, RDLogger
+    from rdkit.Chem import AllChem
+    RDLogger.DisableLog("rdApp.*")
+    from spread_sym import heavy_atom_maps, sym_rmsd
+
+    def pdb_block(smiles, seed=0xf00d):
+        m = Chem.AddHs(Chem.MolFromSmiles(smiles))
+        AllChem.EmbedMolecule(m, randomSeed=seed); AllChem.MMFFOptimizeMolecule(m)
+        m = Chem.RemoveHs(m)
+        b = Chem.MolToPDBBlock(m)
+        return ("\n".join(l.replace("ATOM  ", "HETATM") for l in b.splitlines()
+                           if l.startswith(("ATOM", "HETATM"))) + "\nEND\n", m)
+
+    # counting symmetries off a PDB block must agree with counting off the SMILES
+    for name, smi, expected in [("benzene", "c1ccccc1", 12),
+                                ("para-xylene", "Cc1ccc(C)cc1", 4),
+                                ("biphenyl", "c1ccc(-c2ccccc2)cc1", 8),
+                                ("aspirin", "CC(=O)Oc1ccccc1C(=O)O", 1)]:
+        blk, _ = pdb_block(smi)
+        maps = heavy_atom_maps(blk, smi)
+        check(f"{name} has {expected} symmetries", maps is not None and len(maps) == expected,
+              f"got {len(maps) if maps else 0}")
+
+    # the whole point: relabelling a symmetric molecule is not a movement
+    smi = "Cc1ccc(C)cc1"
+    blk, m = pdb_block(smi)
+    maps = heavy_atom_maps(blk, smi)
+    X = m.GetConformer().GetPositions()
+    perm = [p for p in maps if not np.array_equal(p, maps[0])][0]
+    naive = rmsd(X, X[perm])
+    check("relabelling para-xylene looks like real movement to the naive measure",
+          naive > 1.0, f"{naive:.2f} A")
+    check("and like nothing at all once symmetry is accounted for",
+          sym_rmsd(X, X[perm], maps) < 1e-9, f"{sym_rmsd(X, X[perm], maps):.2e} A")
+except ImportError:
+    print("  skipped, rdkit not installed")
+
 print()
 if fails:
     print(f"{len(fails)} FAILED: " + ", ".join(fails)); sys.exit(1)
