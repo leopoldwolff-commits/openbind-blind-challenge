@@ -40,8 +40,38 @@ def quartiles(xs):
     s = sorted(xs); n = len(s)
     return s[0], s[n // 4], s[n // 2], s[3 * n // 4], s[-1]
 
+def consistency(rows):
+    """Checks on the data itself, not on the arithmetic below.
+
+    The important one is the atom count. spread.csv counts a molecule's heavy
+    atoms out of predictions_r5/; merged.csv counted the same molecule out of
+    predictions/, a different run through a different script. They have to agree,
+    and if they do not, one of the two parsers is reading structures wrongly.
+    """
+    bad = []
+    for r in rows:
+        if int(r["n_poses"]) != 25:
+            bad.append(f"{r['id']}: {r['n_poses']} poses, expected 25")
+        if int(r["n_atoms"]) != int(r["ligand_atoms"]):
+            bad.append(f"{r['id']}: {r['n_atoms']} heavy atoms in the replicates "
+                       f"but {r['ligand_atoms']} in the single-pose run")
+        if float(r["spread_max"]) < float(r["spread_mean"]) - 1e-9:
+            bad.append(f"{r['id']}: widest pair below the mean, impossible")
+        if float(r["spread_mean"]) < 0:
+            bad.append(f"{r['id']}: negative disagreement, impossible")
+    print("-- consistency")
+    if bad:
+        print(f"   {len(bad)} PROBLEMS")
+        for b in bad[:10]: print("     " + b)
+    else:
+        print(f"   {len(rows)} compounds: 25 poses each, heavy-atom counts agree "
+              f"with the independent single-pose run, no impossible values")
+    print()
+    return not bad
+
 def main():
     rows = load()
+    consistency(rows)
     col = lambda k: [float(r[k]) for r in rows]
     S, C, SIM = col("spread_mean"), col("chain_pair_iptm_B_L"), col("max_sim_in_set")
     print(f"{len(rows)} compounds\n")
