@@ -133,6 +133,82 @@ before the replicate run begins. The original single-pose predictions are kept a
 remain in the repository, so if the true structures are released rather than only a
 score, both sets can be scored and the difference between them reported.
 
+### Amendment, 20 November evening: an interruption, and one thing it revealed
+
+The run stopped after seven batches, at 175 of 400, because a second Colab session had
+been left connected and was draining compute. It was not a failure of the run. The
+remaining 225 are being completed in order, unchanged: five seeds, 25 poses, same five
+seed values. Nothing about the design changes.
+
+One thing worth recording, found while checking whether a partial set would have been
+usable. **The 400 are not in random order.** Compounds 1 to 175 are smaller (mean
+weight 305 against 326), less similar to the rest of the set (0.599 against 0.658),
+more fragment-like (29 percent against 20), and lower confidence on every measure.
+Only 12 of 234 scaffolds appear in both halves. The file is ordered by chemical series.
+
+This matters for anyone reading the results, and it would have mattered a great deal
+had the run not been finished: the first 175 are the harder half, not a sample. It is
+also a reason not to analyse the compounds in file order, and not to split them into
+training and held-out groups by position in the file.
+
+### Amendment, 22 November: what the replicates show, before any answer exists
+
+All 400 now have 25 poses each, five seeds by five samples. The disagreement between
+those poses was measured after superposing each pose on the protein backbone, so it is
+the molecule moving in the pocket and not the complex drifting in space. Everything
+below was computed from the model's own output with no access to any answer, and is
+recorded here so none of it can be adjusted afterwards.
+
+**The measure discriminates where confidence does not.** Mean pairwise disagreement
+runs from 0.15 to 6.62 Angstrom, quartiles 0.34 and 1.61, median 0.75. Confidence over
+the same 400 has quartiles 0.873 and 0.972 and sits against its ceiling. 117 compounds,
+29 percent, have 25 poses that average further apart than the 1.5 Angstrom tolerance the
+challenge allows. Those cannot all be within tolerance of one true structure.
+
+**Seed identity turned out to contribute almost nothing.** Within-seed disagreement is
+1.19 Angstrom, between-seed 1.23. The expectation when this was designed was that
+rebuilding the model's internal picture from a new seed would move the answer more than
+redrawing coordinates from a fixed picture. It does, by about three percent. Nearly all
+the variation is in the diffusion step. One seed with 25 samples would have carried
+almost the same information at a fifth of the cost. This is recorded as a result about
+the model, not as an error to bury.
+
+**H5 is weaker than hoped.** Disagreement and confidence correlate at Spearman -0.790.
+They are substantially the same signal, so disagreement cannot beat confidence by much
+overall. H5 now stands or falls on the compounds where the two disagree, which is a
+sharper test than the one originally written and a harder one to pass.
+
+**The size objection, which this document raised in advance, falls on confidence and
+not on disagreement.** The concern recorded before any of this was run was that
+confidence scores an interface, so a smaller molecule makes fewer contacts and scores
+lower for a mechanical reason rather than real doubt. Confidence correlates with
+molecular weight at +0.331 and with heavy atom count at +0.311. Disagreement correlates
+with the same two at +0.032 and +0.030. Disagreement is therefore close to free of the
+artifact that confidence demonstrably carries. This was predicted as a worry and is now
+measured, before any answer was available to tune against.
+
+**The part of disagreement that confidence does not explain still tracks novelty.**
+After removing everything confidence accounts for, the residual correlates with
+within-set similarity at +0.150. Small, but in the direction H6 predicts.
+
+#### Two named predictions, fixed now
+
+Where confidence and disagreement conflict, one of them is wrong. Both groups are named
+in full so neither can be revised later.
+
+*Confident yet self-contradicting*, confidence above 0.95 while the 25 poses average
+further apart than the tolerance. These are predicted to fail more often than their
+confidence implies: blind_challenge_052, 106, 108, 139, 226.
+
+*Doubted yet self-consistent*, confidence at or below 0.95 while the 25 poses agree
+within tolerance. 69 of the 181 low-confidence compounds. These are predicted to succeed
+more often than their confidence implies. The list is `analysis/spread.csv` joined to
+`analysis/register.csv` under exactly those two cutoffs.
+
+If the first group fails and the second succeeds at rates their confidence does not
+predict, disagreement carries information confidence lacks. If both track their
+confidence instead, it does not, and that will be reported as plainly as the alternative.
+
 ## Problems known in advance
 
 **Confidence and novelty are tangled together** at a correlation of 0.674. Separating
