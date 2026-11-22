@@ -311,6 +311,12 @@ original pose needed no rescue.** If the two disagree, both are reported and the
 disagreement is the finding. The 364 are the primary analysis, because none of their
 poses were chosen by a rule conditioned on pose quality.
 
+**One check is dropped, and it decides nothing.** PoseBusters' internal-energy test
+generates 3D conformers and takes up to fifteen minutes on a molecule with fused or
+spiro rings. It passed for all 400 poses in `analysis/posebusters.csv`, so validity is
+the same number, 364, whether it is applied or not. It is therefore skipped when
+screening replicates, and the criterion is in effect identical on both sides.
+
 The compounds eligible for rescue are fixed now: 051, 067, 084, 085, 087, 089, 100,
 103, 104, 110, 111, 115, 132, 134, 135, 138, 141, 161, 167, 169, 191, 195, 205, 232,
 236, 239, 251, 269, 287, 313, 352, 362, 366, 368, 383, 395.

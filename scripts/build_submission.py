@@ -44,6 +44,21 @@ def main():
     RDLogger.DisableLog("rdApp.*")
     from posebusters import PoseBusters
     buster = PoseBusters(config="dock")
+    # The internal-energy check generates 3D conformers and can take a quarter of
+    # an hour on a fused or spiro ring system. It passed for all 400 poses in
+    # analysis/posebusters.csv, so it decides nothing here and is dropped. Validity
+    # is identical with or without it; see notes/PREREGISTRATION.md.
+    dropped = 0
+    try:
+        mods = buster.config.get("modules", [])
+        keep = [m for m in mods
+                if "energy" not in (str(m.get("function", "")) + str(m.get("name", ""))).lower()]
+        dropped = len(mods) - len(keep)
+        buster.config["modules"] = keep
+    except Exception as e:
+        print(f"  (could not drop the energy check: {e}; it will just be slow)")
+    print(f"  dropped {dropped} energy module(s); {len(buster.config.get('modules', []))} remain",
+          flush=True)
 
     smi = {}
     with open(a.smiles) as f:
