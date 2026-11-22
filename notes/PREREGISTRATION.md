@@ -230,6 +230,56 @@ If the first group fails and the second succeeds at rates their confidence does 
 predict, disagreement carries information confidence lacks. If both track their
 confidence instead, it does not, and that will be reported as plainly as the alternative.
 
+### Amendment, 22 November evening: two checks on the measure itself
+
+**Symmetry. Checked because it could have invalidated everything, and it did not.**
+Disagreement was first computed by matching atoms in file order. 46 percent of these
+molecules map onto themselves, so a pose written the other way round would read as a
+large movement when nothing chemically had changed. The challenge scores with
+BiSyRMSD, which minimises over those symmetries; the first version of this measure did
+not. Recomputed properly (`scripts/spread_sym.py`, tested in `scripts/test_spread.py`
+on molecules whose symmetry counts are known), nothing moves:
+
+| | naive | symmetry-corrected |
+| --- | --- | --- |
+| median disagreement | 0.75 A | 0.73 A |
+| above the 1.5 A tolerance | 117 | 112 |
+| against confidence | -0.790 | -0.787 |
+| against molecular weight | +0.032 | +0.040 |
+| against similarity | -0.296 | -0.285 |
+
+Five compounds of 400 change side. The five named predictions are unchanged; the
+second group grows from 69 to 74. All later work uses `analysis/spread_sym.csv`.
+
+**That makes a side observation into a result.** Symmetric molecules disagree at a
+median of 1.16 A against 0.49 A for asymmetric ones, and the gap survives the
+correction, so it is not a measurement artifact. Symmetric molecules are genuinely
+harder for this model to place, which is what one would expect: a molecule that looks
+the same from two directions offers less to fix its orientation.
+
+**PoseBusters. The first outcome in this project that is real and needs no answers.**
+364 of 400 poses are physically possible, 91 percent. 35 of the 36 failures are the
+molecule overlapping the protein it is supposed to sit inside; one is a non-flat ring.
+Those 36 fail the challenge whatever their RMSD, so the score is capped at 91 percent
+before geometry is judged.
+
+Physically invalid poses carry a median disagreement of 1.42 A against 0.64 A for valid
+ones. Bootstrapped over scaffold families, 4000 draws:
+
+| | estimate | 95 percent interval |
+| --- | --- | --- |
+| invalidity against disagreement | +0.190 | +0.108 to +0.285 |
+| invalidity against low confidence | +0.151 | +0.064 to +0.252 |
+| the difference | +0.039 | -0.020 to +0.095 |
+
+Both measures genuinely anticipate a pose being physically impossible. **Whether
+disagreement does it better cannot be established**, which is the same shape of answer
+as the size comparison above, and for the same reason: 222 effective clusters do not
+support fine distinctions between two measures that correlate at -0.79.
+
+This is nonetheless the first evidence that either measure predicts anything real here,
+and it arrived without touching an answer.
+
 ## Problems known in advance
 
 **Confidence and novelty are tangled together** at a correlation of 0.674. Separating
