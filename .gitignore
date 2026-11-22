@@ -16,3 +16,8 @@ __pycache__/
 
 # Unrelated files that live in this folder
 *.png
+# but the figures are part of the record
+!figures/*.png
+
+.venv/
+__pycache__/

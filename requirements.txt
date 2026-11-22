@@ -1,0 +1,5 @@
+# Local analysis. The prediction run itself happens in Colab, see
+# scripts/run_openbind_colab.ipynb, and installs openfold3 there.
+numpy
+matplotlib
+rdkit          # scripts/descriptors.py only

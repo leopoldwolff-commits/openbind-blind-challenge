@@ -36,3 +36,23 @@ data/        challenge inputs (not redistributed here)
 Challenge data is from the OpenBind Consortium and OpenADMET and is not included in
 this repository; see the
 [challenge dataset](https://huggingface.co/datasets/openadmet/openbind-blind-challenge-1).
+
+## Running the analysis
+
+`scripts/stats.py` needs nothing but Python. Everything else wants numpy:
+
+```
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+Then, from the repo root:
+
+```
+python3 scripts/test_spread.py   # known-answer tests of the disagreement code
+python3 scripts/stats.py         # every number quoted in the pre-registration
+python3 scripts/figures.py       # rebuilds figures/
+```
+
+Run them from the root, not from inside `scripts/`, or the imports will not resolve.
