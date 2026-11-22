@@ -280,6 +280,41 @@ support fine distinctions between two measures that correlate at -0.79.
 This is nonetheless the first evidence that either measure predicts anything real here,
 and it arrived without touching an answer.
 
+### Amendment, 22 November: how the submitted pose is chosen
+
+Fixed before the submission is built, and before any answer exists.
+
+**The rule.** For every compound, submit the pose drawn in the original single-pose
+run if PoseBusters passes it. Where it does not, take the 25 replicate poses, keep
+those PoseBusters passes, and submit whichever of those sits closest to their centroid.
+Where none passes, submit the original and record it as unrescued.
+
+The rule is stated once and applies to all 400. What differs between compounds is only
+whether the condition fires, and the condition is a property measured identically for
+every compound. The choice uses the model's own output and the molecule's own geometry.
+No answer enters it, and none exists to enter it.
+
+**Why bother.** 36 of the 400 submitted poses overlap the protein and score zero
+whatever their RMSD. Replicates for those compounds already exist and are very likely
+to contain a pose that does not.
+
+**The guard, and why it is needed.** The 36 failures are not the unfamiliar compounds.
+They are larger (median weight 350 against 324), more similar to the rest of the set
+(0.716 against 0.655), and much less fragment-like (6 percent against 26). Clashing is
+a consequence of having more atoms, not of being novel.
+
+So rescuing them would raise the success rate of exactly the familiar, large compounds
+that H1 and H3 predict should do well anyway. That inflates the effect being tested.
+
+**Therefore H1, H2 and H3 will be reported twice: over all 400, and over the 364 whose
+original pose needed no rescue.** If the two disagree, both are reported and the
+disagreement is the finding. The 364 are the primary analysis, because none of their
+poses were chosen by a rule conditioned on pose quality.
+
+The compounds eligible for rescue are fixed now: 051, 067, 084, 085, 087, 089, 100,
+103, 104, 110, 111, 115, 132, 134, 135, 138, 141, 161, 167, 169, 191, 195, 205, 232,
+236, 239, 251, 269, 287, 313, 352, 362, 366, 368, 383, 395.
+
 ## Problems known in advance
 
 **Confidence and novelty are tangled together** at a correlation of 0.674. Separating
