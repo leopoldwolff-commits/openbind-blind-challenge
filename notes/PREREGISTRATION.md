@@ -178,14 +178,35 @@ They are substantially the same signal, so disagreement cannot beat confidence b
 overall. H5 now stands or falls on the compounds where the two disagree, which is a
 sharper test than the one originally written and a harder one to pass.
 
-**The size objection, which this document raised in advance, falls on confidence and
-not on disagreement.** The concern recorded before any of this was run was that
-confidence scores an interface, so a smaller molecule makes fewer contacts and scores
-lower for a mechanical reason rather than real doubt. Confidence correlates with
-molecular weight at +0.331 and with heavy atom count at +0.311. Disagreement correlates
-with the same two at +0.032 and +0.030. Disagreement is therefore close to free of the
-artifact that confidence demonstrably carries. This was predicted as a worry and is now
-measured, before any answer was available to tune against.
+**The size objection, which this document raised in advance, lands on confidence.
+Whether it spares disagreement cannot be settled with 400 compounds.** The concern
+recorded before any of this was run was that confidence scores an interface, so a
+smaller molecule makes fewer contacts and scores lower for a mechanical reason rather
+than real doubt. Confidence correlates with molecular weight at +0.331 and with heavy
+atom count at +0.311. Disagreement correlates with the same two at +0.032 and +0.030.
+
+Bootstrapping over scaffold families, 4000 draws, as committed to below:
+
+| | estimate | 95 percent interval |
+| --- | --- | --- |
+| confidence against molecular weight | +0.331 | +0.113 to +0.505 |
+| disagreement against molecular weight | +0.032 | -0.169 to +0.270 |
+| the difference | +0.298 | -0.150 to +0.666 |
+
+Confidence's dependence on size clears zero. Disagreement's is consistent with nothing.
+**The difference between the two does not clear zero**, and in 10.4 percent of draws
+disagreement tracked size at least as strongly as confidence did.
+
+So the claim that disagreement escapes an artifact confidence carries is not supported,
+only the weaker pair of statements above. The first reading of these numbers here
+inferred a difference from one correlation being distinguishable from zero while the
+other was not. That inference is invalid, and testing the difference directly is what
+exposed it. Recorded because the mistake is instructive and because an uncorrected
+version of it would have been the headline claim of this project.
+
+The intervals are wide because the 400 compounds are 222 scaffold families, 191 of them
+holding one member. Resampling compounds rather than families would have produced
+narrow intervals and a confident wrong answer.
 
 **The part of disagreement that confidence does not explain still tracks novelty.**
 After removing everything confidence accounts for, the residual correlates with
